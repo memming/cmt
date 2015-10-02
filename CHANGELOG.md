@@ -1,5 +1,18 @@
 # CMT
 
+## 0.5.0
+
+- Regularizers are now more flexible.
+- Several bug fixes and stability improvements.
+- Added binomial distribution.
+- Added StackedAffineTransform.
+
+## 0.4.1
+
+- Added multinomial logistic regression (MLR).
+- Added function for sampling images conditioned on component labels.
+- Extended MCGSM by additional parameters.
+
 ## 0.4.0
 
 - Added spike-triggered mixture model (STM).
@@ -7,6 +20,7 @@
 - Added generalized linear model (GLM) and fully-visible belief network (FVBN).
 - Added mixture of Gaussian scale mixture (MoGSM).
 - Added *PatchMCGSM*.
+- Extended MCGSM by linear features and means.
 - Made implementation of new conditional models easier by introducing interface *Trainable*.
 - Most methods of *MCGSM* can now cope with zero-dimensional inputs.
 

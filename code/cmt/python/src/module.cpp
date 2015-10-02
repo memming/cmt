@@ -14,6 +14,7 @@
 #include "mcbminterface.h"
 #include "mcgsminterface.h"
 #include "mixtureinterface.h"
+#include "mlrinterface.h"
 #include "nonlinearitiesinterface.h"
 #include "patchmodelinterface.h"
 #include "preconditionerinterface.h"
@@ -91,6 +92,7 @@ static PyGetSetDef CD_getset[] = {
 
 static PyMethodDef CD_methods[] = {
 	{"sample", (PyCFunction)CD_sample, METH_VARARGS | METH_KEYWORDS, CD_sample_doc},
+	{"predict", (PyCFunction)CD_predict, METH_VARARGS | METH_KEYWORDS, CD_predict_doc},
 	{"loglikelihood",
 		(PyCFunction)CD_loglikelihood,
 		METH_VARARGS | METH_KEYWORDS,
@@ -99,6 +101,9 @@ static PyMethodDef CD_methods[] = {
 		(PyCFunction)CD_evaluate,
 		METH_VARARGS | METH_KEYWORDS,
 		CD_evaluate_doc},
+	{"_data_gradient",
+		(PyCFunction)CD_data_gradient,
+		METH_VARARGS | METH_KEYWORDS, 0},
 	{0}
 };
 
@@ -174,6 +179,14 @@ static PyGetSetDef MCGSM_getset[] = {
 		(getter)MCGSM_predictors,
 		(setter)MCGSM_set_predictors,
 		"A list of linear predictors, $\\mathbf{A}_c$."},
+	{"linear_features",
+		(getter)MCGSM_linear_features,
+		(setter)MCGSM_set_linear_features,
+		"Linear features, $\\mathbf{w}_c$."},
+	{"means",
+		(getter)MCGSM_means,
+		(setter)MCGSM_set_means,
+		"Means of outputs, $\\mathbf{u}_c$."},
 	{0}
 };
 
@@ -183,10 +196,26 @@ static PyMethodDef MCGSM_methods[] = {
 		METH_VARARGS | METH_KEYWORDS,
 		Trainable_initialize_doc},
 	{"train", (PyCFunction)MCGSM_train, METH_VARARGS | METH_KEYWORDS, MCGSM_train_doc},
+	{"prior",
+		(PyCFunction)MCGSM_prior,
+		METH_VARARGS | METH_KEYWORDS,
+		MCGSM_prior_doc},
 	{"posterior",
 		(PyCFunction)MCGSM_posterior,
 		METH_VARARGS | METH_KEYWORDS,
 		MCGSM_posterior_doc},
+	{"loglikelihood",
+		(PyCFunction)MCGSM_loglikelihood,
+		METH_VARARGS | METH_KEYWORDS,
+		MCGSM_loglikelihood_doc},
+	{"sample",
+		(PyCFunction)MCGSM_sample,
+		METH_VARARGS | METH_KEYWORDS,
+		MCGSM_sample_doc},
+	{"sample_prior",
+		(PyCFunction)MCGSM_sample_prior,
+		METH_VARARGS | METH_KEYWORDS,
+		MCGSM_sample_prior_doc},
 	{"sample_posterior",
 		(PyCFunction)MCGSM_sample_posterior,
 		METH_VARARGS | METH_KEYWORDS,
@@ -211,9 +240,6 @@ static PyMethodDef MCGSM_methods[] = {
 		(PyCFunction)MCGSM_parameter_gradient,
 		METH_VARARGS | METH_KEYWORDS,
 		Trainable_parameter_gradient_doc},
-	{"_compute_data_gradient",
-		(PyCFunction)MCGSM_compute_data_gradient,
-		METH_VARARGS | METH_KEYWORDS, 0},
 	{"__reduce__", (PyCFunction)MCGSM_reduce, METH_NOARGS, MCGSM_reduce_doc},
 	{"__setstate__", (PyCFunction)MCGSM_setstate, METH_VARARGS, MCGSM_setstate_doc},
 	{0}
@@ -373,6 +399,10 @@ static PyGetSetDef STM_getset[] = {
 	{"num_features",
 		(getter)STM_num_features, 0,
 		"Number of features available to approximate input covariances."},
+	{"sharpness",
+		(getter)STM_sharpness,
+		(setter)STM_set_sharpness,
+		"Controls the sharpness of the soft-maximum implemented by the log-sum-exp, $\\lambda$."},
 	{"biases",
 		(getter)STM_biases,
 		(setter)STM_set_biases,
@@ -409,6 +439,14 @@ static PyMethodDef STM_methods[] = {
 		(PyCFunction)Trainable_initialize,
 		METH_VARARGS | METH_KEYWORDS,
 		Trainable_initialize_doc},
+	{"linear_response", 
+		(PyCFunction)STM_linear_response,
+		METH_VARARGS | METH_KEYWORDS,
+		STM_linear_response_doc},
+	{"nonlinear_responses", 
+		(PyCFunction)STM_nonlinear_responses,
+		METH_VARARGS | METH_KEYWORDS,
+		STM_nonlinear_responses_doc},
 	{"train", (PyCFunction)STM_train, METH_VARARGS | METH_KEYWORDS, STM_train_doc},
 	{"_parameters",
 		(PyCFunction)STM_parameters,
@@ -422,6 +460,10 @@ static PyMethodDef STM_methods[] = {
 		(PyCFunction)STM_parameter_gradient,
 		METH_VARARGS | METH_KEYWORDS,
 		Trainable_parameter_gradient_doc},
+	{"_fisher_information",
+		(PyCFunction)STM_fisher_information,
+		METH_VARARGS | METH_KEYWORDS, 
+		Trainable_fisher_information_doc},
 	{"_check_performance",
 		(PyCFunction)STM_check_performance,
 		METH_VARARGS | METH_KEYWORDS,
@@ -526,7 +568,7 @@ PyTypeObject Mixture_type = {
 	0,                                /*tp_setattro*/
 	0,                                /*tp_as_buffer*/
 	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
-	0,                                /*tp_doc*/
+	Mixture_doc,                      /*tp_doc*/
 	0,                                /*tp_traverse*/
 	0,                                /*tp_clear*/
 	0,                                /*tp_richcompare*/
@@ -581,7 +623,7 @@ PyTypeObject MoGSM_type = {
 	0,                                /*tp_setattro*/
 	0,                                /*tp_as_buffer*/
 	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
-	0,                                /*tp_doc*/
+	MoGSM_doc,                        /*tp_doc*/
 	0,                                /*tp_traverse*/
 	0,                                /*tp_clear*/
 	0,                                /*tp_richcompare*/
@@ -629,7 +671,7 @@ PyTypeObject MixtureComponent_type = {
 	0,                                /*tp_setattro*/
 	0,                                /*tp_as_buffer*/
 	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
-	0,                                /*tp_doc*/
+	MixtureComponent_doc,             /*tp_doc*/
 	0,                                /*tp_traverse*/
 	0,                                /*tp_clear*/
 	0,                                /*tp_richcompare*/
@@ -912,7 +954,7 @@ static PyGetSetDef GLM_getset[] = {
 	{"weights",
 		(getter)GLM_weights,
 		(setter)GLM_set_weights,
-		"Linear filter, $w$."},
+		"Linear filter, $\\mathbf{w}$."},
 	{"bias",
 		(getter)GLM_bias,
 		(setter)GLM_set_bias,
@@ -940,13 +982,18 @@ static PyMethodDef GLM_methods[] = {
 		Trainable_set_parameters_doc},
 	{"_parameter_gradient",
 		(PyCFunction)GLM_parameter_gradient,
-		METH_VARARGS | METH_KEYWORDS, 0},
+		METH_VARARGS | METH_KEYWORDS, 
+		Trainable_parameter_gradient_doc},
+	{"_fisher_information",
+		(PyCFunction)GLM_fisher_information,
+		METH_VARARGS | METH_KEYWORDS, 
+		Trainable_fisher_information_doc},
 	{"_check_gradient",
 		(PyCFunction)GLM_check_gradient,
 		METH_VARARGS | METH_KEYWORDS,
 		Trainable_check_gradient_doc},
 	{"_check_performance",
-		(PyCFunction)STM_check_performance,
+		(PyCFunction)GLM_check_performance,
 		METH_VARARGS | METH_KEYWORDS,
 		Trainable_check_performance_doc},
 	{"__reduce__", (PyCFunction)GLM_reduce, METH_NOARGS, GLM_reduce_doc},
@@ -992,6 +1039,86 @@ PyTypeObject GLM_type = {
 	0,                       /*tp_descr_set*/
 	0,                       /*tp_dictoffset*/
 	(initproc)GLM_init,      /*tp_init*/
+	0,                       /*tp_alloc*/
+	CD_new,                  /*tp_new*/
+};
+
+static PyGetSetDef MLR_getset[] = {
+	{"weights",
+		(getter)MLR_weights,
+		(setter)MLR_set_weights,
+		"Linear filters, $\\mathbf{w}_i$, one per row."},
+	{"biases",
+		(getter)MLR_biases,
+		(setter)MLR_set_biases,
+		"Bias terms, $b_i$."},
+	{0}
+};
+
+static PyMethodDef MLR_methods[] = {
+	{"train", (PyCFunction)MLR_train, METH_VARARGS | METH_KEYWORDS, MLR_train_doc},
+	{"_parameters",
+		(PyCFunction)MLR_parameters,
+		METH_VARARGS | METH_KEYWORDS,
+		Trainable_parameters_doc},
+	{"_set_parameters",
+		(PyCFunction)MLR_set_parameters,
+		METH_VARARGS | METH_KEYWORDS,
+		Trainable_set_parameters_doc},
+	{"_parameter_gradient",
+		(PyCFunction)MLR_parameter_gradient,
+		METH_VARARGS | METH_KEYWORDS, 0},
+	{"_check_gradient",
+		(PyCFunction)MLR_check_gradient,
+		METH_VARARGS | METH_KEYWORDS,
+		Trainable_check_gradient_doc},
+	{"_check_performance",
+		(PyCFunction)STM_check_performance,
+		METH_VARARGS | METH_KEYWORDS,
+		Trainable_check_performance_doc},
+	{"__reduce__", (PyCFunction)MLR_reduce, METH_NOARGS, MLR_reduce_doc},
+	{"__setstate__", (PyCFunction)MLR_setstate, METH_VARARGS, MLR_setstate_doc},
+	{0}
+};
+
+PyTypeObject MLR_type = {
+	PyObject_HEAD_INIT(0)
+	0,                       /*ob_size*/
+	"cmt.models.MLR",        /*tp_name*/
+	sizeof(MLRObject),       /*tp_basicsize*/
+	0,                       /*tp_itemsize*/
+	(destructor)MLR_dealloc, /*tp_dealloc*/
+	0,                       /*tp_print*/
+	0,                       /*tp_getattr*/
+	0,                       /*tp_setattr*/
+	0,                       /*tp_compare*/
+	0,                       /*tp_repr*/
+	0,                       /*tp_as_number*/
+	0,                       /*tp_as_sequence*/
+	0,                       /*tp_as_mapping*/
+	0,                       /*tp_hash */
+	0,                       /*tp_call*/
+	0,                       /*tp_str*/
+	0,                       /*tp_getattro*/
+	0,                       /*tp_setattro*/
+	0,                       /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT,      /*tp_flags*/
+	MLR_doc,                 /*tp_doc*/
+	0,                       /*tp_traverse*/
+	0,                       /*tp_clear*/
+	0,                       /*tp_richcompare*/
+	0,                       /*tp_weaklistoffset*/
+	0,                       /*tp_iter*/
+	0,                       /*tp_iternext*/
+	MLR_methods,             /*tp_methods*/
+	0,                       /*tp_members*/
+	MLR_getset,              /*tp_getset*/
+	&CD_type,                /*tp_base*/
+	0,                       /*tp_dict*/
+	0,                       /*tp_descr_get*/
+	0,                       /*tp_descr_set*/
+	0,                       /*tp_dictoffset*/
+	(initproc)MLR_init,      /*tp_init*/
 	0,                       /*tp_alloc*/
 	CD_new,                  /*tp_new*/
 };
@@ -1598,6 +1725,53 @@ PyTypeObject Poisson_type = {
 	Distribution_new,                 /*tp_new*/
 };
 
+static PyMethodDef Binomial_methods[] = {
+	{"__reduce__", (PyCFunction)Binomial_reduce, METH_NOARGS, Binomial_reduce_doc},
+	{0}
+};
+
+PyTypeObject Binomial_type = {
+	PyObject_HEAD_INIT(0)
+	0,                                /*ob_size*/
+	"cmt.models.Binomial",            /*tp_name*/
+	sizeof(BinomialObject),           /*tp_basicsize*/
+	0,                                /*tp_itemsize*/
+	(destructor)Distribution_dealloc, /*tp_dealloc*/
+	0,                                /*tp_print*/
+	0,                                /*tp_getattr*/
+	0,                                /*tp_setattr*/
+	0,                                /*tp_compare*/
+	0,                                /*tp_repr*/
+	0,                                /*tp_as_number*/
+	0,                                /*tp_as_sequence*/
+	0,                                /*tp_as_mapping*/
+	0,                                /*tp_hash */
+	0,                                /*tp_call*/
+	0,                                /*tp_str*/
+	0,                                /*tp_getattro*/
+	0,                                /*tp_setattro*/
+	0,                                /*tp_as_buffer*/
+	Py_TPFLAGS_DEFAULT,               /*tp_flags*/
+	Binomial_doc,                     /*tp_doc*/
+	0,                                /*tp_traverse*/
+	0,                                /*tp_clear*/
+	0,                                /*tp_richcompare*/
+	0,                                /*tp_weaklistoffset*/
+	0,                                /*tp_iter*/
+	0,                                /*tp_iternext*/
+	Binomial_methods,                 /*tp_methods*/
+	0,                                /*tp_members*/
+	0,                                /*tp_getset*/
+	&UnivariateDistribution_type,     /*tp_base*/
+	0,                                /*tp_dict*/
+	0,                                /*tp_descr_get*/
+	0,                                /*tp_descr_set*/
+	0,                                /*tp_dictoffset*/
+	(initproc)Binomial_init,          /*tp_init*/
+	0,                                /*tp_alloc*/
+	Distribution_new,                 /*tp_new*/
+};
+
 static PyGetSetDef Preconditioner_getset[] = {
 	{"dim_in", (getter)Preconditioner_dim_in, 0, 0},
 	{"dim_in_pre", (getter)Preconditioner_dim_in_pre, 0, 0},
@@ -2019,6 +2193,8 @@ static PyMethodDef cmt_methods[] = {
 	{"generate_data_from_image", (PyCFunction)generate_data_from_image, METH_VARARGS | METH_KEYWORDS, generate_data_from_image_doc},
 	{"generate_data_from_video", (PyCFunction)generate_data_from_video, METH_VARARGS | METH_KEYWORDS, generate_data_from_video_doc},
 	{"sample_image", (PyCFunction)sample_image, METH_VARARGS | METH_KEYWORDS, sample_image_doc},
+	{"sample_image_conditionally", (PyCFunction)sample_image_conditionally, METH_VARARGS | METH_KEYWORDS, sample_image_conditionally_doc},
+	{"sample_labels_conditionally", (PyCFunction)sample_labels_conditionally, METH_VARARGS | METH_KEYWORDS, sample_labels_conditionally_doc},
 	{"sample_video", (PyCFunction)sample_video, METH_VARARGS | METH_KEYWORDS, sample_video_doc},
 	{"fill_in_image", (PyCFunction)fill_in_image, METH_VARARGS | METH_KEYWORDS, fill_in_image_doc},
 	{"fill_in_image_map", (PyCFunction)fill_in_image_map, METH_VARARGS | METH_KEYWORDS, 0},
@@ -2047,6 +2223,8 @@ PyMODINIT_FUNC init_cmt() {
 	if(PyType_Ready(&Bernoulli_type) < 0)
 		return;
 	if(PyType_Ready(&BinningTransform_type) < 0)
+		return;
+	if(PyType_Ready(&Binomial_type) < 0)
 		return;
 	if(PyType_Ready(&BlobNonlinearity_type) < 0)
 		return;
@@ -2077,6 +2255,8 @@ PyMODINIT_FUNC init_cmt() {
 	if(PyType_Ready(&Mixture_type) < 0)
 		return;
 	if(PyType_Ready(&MixtureComponent_type) < 0)
+		return;
+	if(PyType_Ready(&MLR_type) < 0)
 		return;
 	if(PyType_Ready(&MoGSM_type) < 0)
 		return;
@@ -2117,6 +2297,7 @@ PyMODINIT_FUNC init_cmt() {
 	Py_INCREF(&AffineTransform_type);
 	Py_INCREF(&Bernoulli_type);
 	Py_INCREF(&BinningTransform_type);
+	Py_INCREF(&Binomial_type);
 	Py_INCREF(&BlobNonlinearity_type);
 	Py_INCREF(&CD_type);
 	Py_INCREF(&DifferentiableNonlinearity_type);
@@ -2132,6 +2313,7 @@ PyMODINIT_FUNC init_cmt() {
 	Py_INCREF(&MCGSM_type);
 	Py_INCREF(&Mixture_type);
 	Py_INCREF(&MixtureComponent_type);
+	Py_INCREF(&MLR_type);
 	Py_INCREF(&MoGSM_type);
 	Py_INCREF(&Nonlinearity_type);
 	Py_INCREF(&PCAPreconditioner_type);
@@ -2152,6 +2334,7 @@ PyMODINIT_FUNC init_cmt() {
 	PyModule_AddObject(module, "AffineTransform", reinterpret_cast<PyObject*>(&AffineTransform_type));
 	PyModule_AddObject(module, "Bernoulli", reinterpret_cast<PyObject*>(&Bernoulli_type));
 	PyModule_AddObject(module, "BinningTransform", reinterpret_cast<PyObject*>(&BinningTransform_type));
+	PyModule_AddObject(module, "Binomial", reinterpret_cast<PyObject*>(&Binomial_type));
 	PyModule_AddObject(module, "BlobNonlinearity", reinterpret_cast<PyObject*>(&BlobNonlinearity_type));
 	PyModule_AddObject(module, "ConditionalDistribution", reinterpret_cast<PyObject*>(&CD_type));
 	PyModule_AddObject(module, "DifferentiableNonlinearity", reinterpret_cast<PyObject*>(&DifferentiableNonlinearity_type));
@@ -2167,6 +2350,7 @@ PyMODINIT_FUNC init_cmt() {
 	PyModule_AddObject(module, "MCGSM", reinterpret_cast<PyObject*>(&MCGSM_type));
 	PyModule_AddObject(module, "Mixture", reinterpret_cast<PyObject*>(&Mixture_type));
 	PyModule_AddObject(module, "MixtureComponent", reinterpret_cast<PyObject*>(&MixtureComponent_type));
+	PyModule_AddObject(module, "MLR", reinterpret_cast<PyObject*>(&MLR_type));
 	PyModule_AddObject(module, "MoGSM", reinterpret_cast<PyObject*>(&MoGSM_type));
 	PyModule_AddObject(module, "Nonlinearity", reinterpret_cast<PyObject*>(&Nonlinearity_type));
 	PyModule_AddObject(module, "PCAPreconditioner", reinterpret_cast<PyObject*>(&PCAPreconditioner_type));

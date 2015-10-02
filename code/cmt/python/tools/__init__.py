@@ -2,6 +2,8 @@ __all__ = [
 	"generate_data_from_image",
 	"generate_data_from_video",
 	"sample_image",
+	"sample_image_conditionally",
+	"sample_labels_conditionally",
 	"sample_video",
 	"fill_in_image",
 	"fill_in_image_map",
@@ -20,6 +22,8 @@ __all__ = [
 from _cmt import generate_data_from_image
 from _cmt import generate_data_from_video
 from _cmt import sample_image
+from _cmt import sample_image_conditionally
+from _cmt import sample_labels_conditionally
 from _cmt import sample_video
 from _cmt import fill_in_image
 from _cmt import fill_in_image_map

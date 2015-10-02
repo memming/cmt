@@ -21,6 +21,7 @@ extern PyTypeObject Preconditioner_type;
 
 extern const char* CD_doc;
 extern const char* CD_sample_doc;
+extern const char* CD_predict_doc;
 extern const char* CD_loglikelihood_doc;
 extern const char* CD_evaluate_doc;
 
@@ -32,7 +33,9 @@ PyObject* CD_dim_in(CDObject*, PyObject*, void*);
 PyObject* CD_dim_out(CDObject*, PyObject*, void*);
 
 PyObject* CD_sample(CDObject*, PyObject*, PyObject*);
+PyObject* CD_predict(CDObject*, PyObject*, PyObject*);
 PyObject* CD_loglikelihood(CDObject*, PyObject*, PyObject*);
 PyObject* CD_evaluate(CDObject*, PyObject*, PyObject*);
+PyObject* CD_data_gradient(CDObject*, PyObject*, PyObject*);
 
 #endif

@@ -12,14 +12,16 @@ from utils import parallelCCompiler
 from numpy.distutils.intelccompiler import IntelCCompiler
 from numpy import any
 
+INTEL_PATH = '/opt/intel/'
+
 # heuristic for figuring out which compiler is being used (icc, gcc)
 if any(['intel' in arg for arg in sys.argv]) or 'intel' in get_default_compiler():
 	# icc-specific options
 	include_dirs=[
-		'/opt/intel/mkl/include']
+		os.path.join(INTEL_PATH, 'mkl/include')]
 	library_dirs=[
-		'/opt/intel/mkl/lib',
-		'/opt/intel/lib']
+		os.path.join(INTEL_PATH, 'mkl/lib'),
+		os.path.join(INTEL_PATH, 'lib')]
 	libraries = [
 		'mkl_intel_lp64',
 		'mkl_intel_thread',
@@ -31,30 +33,34 @@ if any(['intel' in arg for arg in sys.argv]) or 'intel' in get_default_compiler(
 		'-DEIGEN_USE_MKL_ALL',
 		'-Wno-deprecated',
 		'-wd1224',
-		'-openmp']
+		'-openmp',
+		'-std=c++0x']
 	extra_link_args = []
 
-	for path in ['/opt/intel/mkl/lib/intel64', '/opt/intel/lib/intel64']:
+	for path in [os.path.join(INTEL_PATH, 'mkl/lib/intel64'), os.path.join(INTEL_PATH, 'lib/intel64')]:
 		if os.path.exists(path):
 			library_dirs += [path]
+
+elif sys.platform == 'darwin':
+	# clang-specific options
+	include_dirs = []
+	library_dirs = []
+	libraries = []
+	extra_compile_args = ['-std=c++0x', '-stdlib=libc++']
+	extra_link_args = []
+
+	os.environ['CC'] = 'clang++'
+	os.environ['CXX'] = 'clang++'
+	os.environ['MACOSX_DEPLOYMENT_TARGET'] = '10.7'
+
 else:
 	# gcc-specific options
 	include_dirs = []
 	library_dirs = []
-	libraries = []
-	extra_compile_args = []
+	libraries = ['gomp']
+	extra_compile_args = ['-std=c++0x', '-Wno-cpp', '-fopenmp']
 	extra_link_args = []
 
-	if sys.platform != 'darwin':
-		libraries += [
-			'gomp']
-		extra_compile_args += [
-			'-Wno-cpp',
-			'-fopenmp']
-
-if sys.platform != 'darwin':
-	extra_compile_args += [
-		'-std=c++0x']
 
 modules = [
 	Extension('_cmt',
@@ -70,6 +76,7 @@ modules = [
 			'code/cmt/python/src/mcgsminterface.cpp',
 			'code/cmt/python/src/module.cpp',
 			'code/cmt/python/src/mixtureinterface.cpp',
+			'code/cmt/python/src/mlrinterface.cpp',
 			'code/cmt/python/src/nonlinearitiesinterface.cpp',
 			'code/cmt/python/src/patchmodelinterface.cpp',
 			'code/cmt/python/src/preconditionerinterface.cpp',
@@ -88,11 +95,13 @@ modules = [
 			'code/cmt/src/mcbm.cpp',
 			'code/cmt/src/mcgsm.cpp',
 			'code/cmt/src/mixture.cpp',
+			'code/cmt/src/mlr.cpp',
 			'code/cmt/src/nonlinearities.cpp',
 			'code/cmt/src/patchmodel.cpp',
 			'code/cmt/src/pcapreconditioner.cpp',
 			'code/cmt/src/pcatransform.cpp',
 			'code/cmt/src/preconditioner.cpp',
+			'code/cmt/src/regularizer.cpp',
 			'code/cmt/src/stm.cpp',
 			'code/cmt/src/tools.cpp',
 			'code/cmt/src/trainable.cpp',
@@ -112,6 +121,7 @@ modules = [
 			'-fPIC',
 			'code/liblbfgs/lib/.libs/liblbfgs.a'] + extra_link_args,
 		extra_compile_args=[
+			'-DEIGEN_NO_DEBUG',
 			'-Wno-sign-compare',
 			'-Wno-parentheses',
 			'-Wno-write-strings'] + extra_compile_args)]
@@ -121,7 +131,7 @@ CCompiler.compile = parallelCCompiler
 
 setup(
 	name='cmt',
-	version='0.3.5',
+	version='0.5.0',
 	author='Lucas Theis',
 	author_email='lucas@theis.io',
 	description='Fast implementations of different probabilistic models.',

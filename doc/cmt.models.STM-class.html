@@ -73,13 +73,13 @@
   </tr>
 </table>
 <!-- ==================== CLASS DESCRIPTION ==================== -->
-<h1 class="epydoc">Class STM</h1><p class="nomargin-top"><span class="codelink"><a href="cmt.models-pysrc.html#STM">source&nbsp;code</a></span></p>
+<h1 class="epydoc">Class STM</h1><p class="nomargin-top"><span class="codelink"><a href="cmt-pysrc.html#models.STM">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-             object --+    
-                      |    
-<a href="cmt.models.ConditionalDistribution-class.html">ConditionalDistribution</a> --+
-                          |
-                         <strong class="uidshort">STM</strong>
+                    object --+    
+                             |    
+<a href="cmt.models.ConditionalDistribution-class.html">models.ConditionalDistribution</a> --+
+                                 |
+                                <strong class="uidshort">models.STM</strong>
 </pre>
 
 <hr />
@@ -90,9 +90,10 @@
   <p>where $y$ is a scalar, $\mathbf{x} \in \mathbb{R}^N$, $\mathbf{z} \in 
   \mathbb{R}^M$, $q$ is a univariate distribution, $g$ is some 
   nonlinearity, and</p>
-  <p>$$f(\mathbf{x}, \mathbf{z}) = \log \sum_k \exp\left( \sum_l \beta_{kl}
-  (\mathbf{u}_l^\top \mathbf{x})^2 + \mathbf{w}_k \mathbf{x} + a_k \right) 
-  + \mathbf{v}^\top \mathbf{z}.$$</p>
+  <p>$$f(\mathbf{x}, \mathbf{z}) = \log \sum_k \exp\left( \lambda \left[ 
+  \sum_l \beta_{kl} (\mathbf{u}_l^\top \mathbf{x})^2 + \mathbf{w}_k 
+  \mathbf{x} + a_k \right] \right) / \lambda + \mathbf{v}^\top 
+  \mathbf{z}.$$</p>
   <p>As you can see from the equation above, part of the input is processed
   nonlinearly and part of the input is processed linearly. To create an STM
   with $N$-dimensional nonlinear inputs $\mathbf{x}$ and $M$-dimensional 
@@ -102,6 +103,7 @@
 <span class="py-prompt">&gt;&gt;&gt; </span>stm = STM(N, M, 3, 20, LogisticFunction, Bernoulli)</pre>
   <p>To access the different parameters, you can use</p>
 <pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span>stm.sharpness
 <span class="py-prompt">&gt;&gt;&gt; </span>stm.biases
 <span class="py-prompt">&gt;&gt;&gt; </span>stm.weights
 <span class="py-prompt">&gt;&gt;&gt; </span>stm.features
@@ -138,7 +140,7 @@
           <td><span class="summary-sig"><a href="cmt.models.STM-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">...</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM.__init__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.__init__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -156,7 +158,7 @@
         <span class="summary-sig-arg">S</span>,
         <span class="summary-sig-arg">...</span>)</span></td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM.__new__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.__new__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -173,7 +175,7 @@
           <td><span class="summary-sig"><a href="cmt.models.STM-class.html#__reduce__" class="summary-sig-name">__reduce__</a>(<span class="summary-sig-arg">self</span>)</span><br />
       Method used by Pickle.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM.__reduce__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.__reduce__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -190,7 +192,7 @@
           <td><span class="summary-sig"><a name="__setstate__"></a><span class="summary-sig-name">__setstate__</span>(<span class="summary-sig-arg">self</span>)</span><br />
       Method used by Pickle.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM.__setstate__">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.__setstate__">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -211,7 +213,7 @@
         <span class="summary-sig-arg">parameters</span>=<span class="summary-sig-default">None</span>)</span><br />
       Compare the gradient to a numerical gradient.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM._check_gradient">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM._check_gradient">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -233,7 +235,30 @@
       Measures the time it takes to evaluate the parameter gradient for the
       given data points.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM._check_performance">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM._check_performance">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>ndarray</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="cmt.models.STM-class.html#_fisher_information" class="summary-sig-name" onclick="show_private();">_fisher_information</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">input</span>,
+        <span class="summary-sig-arg">output</span>,
+        <span class="summary-sig-arg">x</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">parameters</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Estimates the Fisher information matrix of the parameters as returned
+      by <a href="cmt.models.STM-class.html#_parameters" class="link" 
+      onclick="show_private();">_parameters()</a>.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM._fisher_information">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -256,7 +281,7 @@
       href="cmt.models.STM-class.html#_parameters" class="link" 
       onclick="show_private();">_parameters()</a>.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM._parameter_gradient">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM._parameter_gradient">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -274,7 +299,7 @@
         <span class="summary-sig-arg">parameters</span>=<span class="summary-sig-default">None</span>)</span><br />
       Summarizes the parameters of the model in a long vector.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM._parameters">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM._parameters">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -294,7 +319,7 @@
       Loads all model parameters from a vector as produced by <code 
       class="link">parameters()</code>.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM._set_parameters">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM._set_parameters">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -314,7 +339,44 @@
       Tries to guess more sensible initial values for the model parameters 
       from data.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM.initialize">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.initialize">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>ndarray</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="cmt.models.STM-class.html#linear_response" class="summary-sig-name">linear_response</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">input</span>)</span><br />
+      Computes the linear portion of the intenal response, $\mathbf{v}^\top
+      \mathbf{z}$.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.linear_response">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type"><code>ndarray</code></span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="cmt.models.STM-class.html#nonlinear_responses" class="summary-sig-name">nonlinear_responses</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">input</span>)</span><br />
+      Computes the nonlinear response of each component,</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.nonlinear_responses">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -336,7 +398,7 @@
         <span class="summary-sig-arg">parameters</span>=<span class="summary-sig-default">None</span>)</span><br />
       Fits model parameters to given data using L-BFGS.</td>
           <td align="right" valign="top">
-            <span class="codelink"><a href="cmt.models-pysrc.html#STM.train">source&nbsp;code</a></span>
+            <span class="codelink"><a href="cmt-pysrc.html#models.STM.train">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -349,8 +411,12 @@
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="cmt.models.ConditionalDistribution-class.html">ConditionalDistribution</a></code></b>:
       <code><a href="cmt.models.ConditionalDistribution-class.html#evaluate">evaluate</a></code>,
       <code><a href="cmt.models.ConditionalDistribution-class.html#loglikelihood">loglikelihood</a></code>,
+      <code><a href="cmt.models.ConditionalDistribution-class.html#predict">predict</a></code>,
       <code><a href="cmt.models.ConditionalDistribution-class.html#sample">sample</a></code>
       </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="cmt.models.ConditionalDistribution-class.html">ConditionalDistribution</a></code></b> (private):
+      <code><a href="cmt.models.ConditionalDistribution-class.html#_data_gradient" onclick="show_private();">_data_gradient</a></code>
+      </p></div>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
       <code>__format__</code>,
@@ -468,6 +534,15 @@
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
+        <a name="sharpness"></a><span class="summary-name">sharpness</span><br />
+      Controls the sharpness of the soft-maximum implemented by the 
+      log-sum-exp, $\lambda$.
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
         <a name="weights"></a><span class="summary-name">weights</span><br />
       Weights relating features and mixture components, $\beta_{kl}$.
     </td>
@@ -513,7 +588,7 @@
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM.__init__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.__init__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -552,7 +627,7 @@
         <span class="sig-arg">...</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM.__new__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.__new__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -575,7 +650,7 @@
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__reduce__</span>(<span class="sig-arg">self</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM.__reduce__">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.__reduce__">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -601,7 +676,7 @@
         <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM._check_gradient">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM._check_gradient">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -637,7 +712,7 @@
         <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM._check_performance">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM._check_performance">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -658,6 +733,39 @@
   </dl>
 </td></tr></table>
 </div>
+<a name="_fisher_information"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_fisher_information</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">input</span>,
+        <span class="sig-arg">output</span>,
+        <span class="sig-arg">x</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM._fisher_information">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Estimates the Fisher information matrix of the parameters as returned 
+  by <a href="cmt.models.STM-class.html#_parameters" class="link" 
+  onclick="show_private();">_parameters()</a>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>input</code></strong> (<code>ndarray</code>) - inputs stored in columns</li>
+        <li><strong class="pname"><code>output</code></strong> (<code>ndarray</code>) - outputs stored in columns</li>
+        <li><strong class="pname"><code>parameters</code></strong> (<code>dict</code>) - a dictionary containing hyperparameters</li>
+    </ul></dd>
+    <dt>Returns: <code>ndarray</code></dt>
+        <dd>the Fisher information matrix</dd>
+  </dl>
+</td></tr></table>
+</div>
 <a name="_parameter_gradient"></a>
 <div class="private">
 <table class="details" border="1" cellpadding="3"
@@ -672,7 +780,7 @@
         <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM._parameter_gradient">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM._parameter_gradient">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -705,7 +813,7 @@
         <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM._parameters">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM._parameters">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -734,7 +842,7 @@
         <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM._set_parameters">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM._set_parameters">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -761,7 +869,7 @@
         <span class="sig-arg">output</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM.initialize">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.initialize">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -773,6 +881,66 @@
         <li><strong class="pname"><code>input</code></strong> (<code>ndarray</code>) - inputs stored in columns</li>
         <li><strong class="pname"><code>output</code></strong> (<code>ndarray</code>) - outputs stored in columns</li>
     </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="linear_response"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">linear_response</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">input</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.linear_response">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Computes the linear portion of the intenal response, $\mathbf{v}^\top 
+  \mathbf{z}$. The input can be the full input or just the linear part, 
+  that is, it can be of dimension <code>dimIn()</code> or of dimension 
+  <code>dimInLinear()</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>input</code></strong> (<code>ndarray</code>) - inputs stored in columns</li>
+    </ul></dd>
+    <dt>Returns: <code>ndarray</code></dt>
+        <dd>the output of the linear filter</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="nonlinear_responses"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">nonlinear_responses</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">input</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.nonlinear_responses">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Computes the nonlinear response of each component,</p>
+  <p>$$\sum_l \beta_{kl} (\mathbf{u}_l^\top \mathbf{x})^2 + \mathbf{w}_k 
+  \mathbf{x} + a_k.$$</p>
+  <p>The input can be the full input or just the nonlinear part, that is, 
+  it can be of dimension <code>dimIn()</code> or of dimension 
+  <code>dimInNonlinear()</code>.</p>
+  <dl class="fields">
+    <dt>Parameters:</dt>
+    <dd><ul class="nomargin-top">
+        <li><strong class="pname"><code>input</code></strong> (<code>ndarray</code>) - inputs stored in columns</li>
+    </ul></dd>
+    <dt>Returns: <code>ndarray</code></dt>
+        <dd>one response for each component and each input</dd>
   </dl>
 </td></tr></table>
 </div>
@@ -791,7 +959,7 @@
         <span class="sig-arg">parameters</span>=<span class="sig-default">None</span>)</span>
   </h3>
   </td><td align="right" valign="top"
-    ><span class="codelink"><a href="cmt.models-pysrc.html#STM.train">source&nbsp;code</a></span>&nbsp;
+    ><span class="codelink"><a href="cmt-pysrc.html#models.STM.train">source&nbsp;code</a></span>&nbsp;
     </td>
   </tr></table>
   
@@ -814,11 +982,24 @@
 <span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'train_features'</span>: True,
 <span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'train_predictors'</span>: True,
 <span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'train_linear_predictor'</span>: True,
-<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularizer'</span>: <span class="py-string">'L2'</span>,
-<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_features'</span>: 0.,
-<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_weights'</span>: 0.,
-<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_predictors'</span>: 0.
-<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_linear_predictor'</span>: 0.
+<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_biases'</span>: {
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'strength'</span>: 0.,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'norm'</span>: <span class="py-string">'L2'</span>},
+<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_features'</span>: {
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'strength'</span>: 0.,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'transform'</span>: None,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'norm'</span>: <span class="py-string">'L2'</span>},
+<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_weights'</span>: {
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'strength'</span>: 0.,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'norm'</span>: <span class="py-string">'L2'</span>},
+<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_predictors'</span>: {
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'strength'</span>: 0.,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'transform'</span>: None,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'norm'</span>: <span class="py-string">'L2'</span>},
+<span class="py-prompt">&gt;&gt;&gt; </span>    <span class="py-string">'regularize_linear_predictor'</span>: {
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'strength'</span>: 0.,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'transform'</span>: None,
+<span class="py-prompt">&gt;&gt;&gt; </span>            <span class="py-string">'norm'</span>: <span class="py-string">'L2'</span>},
 <span class="py-prompt">&gt;&gt;&gt; </span>})</pre>
   <p>The parameters <code>train_biases</code>, <code>train_weights</code>, 
   and so on can be used to control which parameters will be optimized. 
@@ -827,6 +1008,12 @@
   specified by <code>threshold</code>. <code>num_grad</code> is the number 
   of gradients used by L-BFGS to approximate the inverse Hessian 
   matrix.</p>
+  <p>Regularization of parameters $\mathbf{z}$ adds a penalty term</p>
+  <p>$$\eta ||\mathbf{A} \mathbf{z}||_p$$</p>
+  <p>to the average log-likelihood, where $\eta$ is given by 
+  <code>strength</code>, $\mathbf{A}$ is given by <code>transform</code>, 
+  and $p$ is controlled by <code>norm</code>, which has to be either 
+  <code>'L1'</code> or <code>'L2'</code>.</p>
   <p>The parameter <code>batch_size</code> has no effect on the solution of
   the optimization but can affect speed by reducing the number of cache 
   misses.</p>
@@ -884,7 +1071,7 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Sep 15 16:28:16 2013
+    Generated by Epydoc 3.0.1 on Thu Apr 17 11:47:34 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
